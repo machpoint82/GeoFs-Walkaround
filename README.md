@@ -65,7 +65,7 @@ Adjustable parameters:
    - [Tampermonkey](https://www.tampermonkey.net/) (recommended)
    - or Violentmonkey / Greasemonkey
 
-2. [Click here to install](https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js) or if [this link](https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js) is not working, copy everything inside, [GeoFs-walkaround.user.js](GeoFs-walkaround.user.js) in this repository, go to tampermonkey new userscript tab, delete everything there and paste the contents you copied
+2. [Click here to install](https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js) or if [this link](https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js) is not working, copy everything inside, [geofs-walkaround.user.js](geofs-walkaround.user.js) in this repository, go to tampermonkey new userscript tab, delete everything there and paste the contents you copied
 
 ---
 
@@ -106,4 +106,4 @@ All hotkeys can be changed in **Settings**.
 **Version:** 1.0-beta  
 **License:** See [License](license.md)
 
-_© 2026 [machpoint82](https:www.github.com/machpoint82)_
+_© 2026_ [machpoint82](https://www.github.com/machpoint82)
