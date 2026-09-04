@@ -104,6 +104,6 @@ All hotkeys can be changed in **Settings**.
 ---
 
 **Version:** 1.0-beta  
-**License:** See [License](license.md)
+**License:** See [License](LICENSE)
 
 _© 2026_ [machpoint82](https://www.github.com/machpoint82)
