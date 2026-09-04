@@ -14,7 +14,7 @@ Walk around your aircraft on the ground, inspect parts, run a realistic checklis
 Walkaround can only be started when all conditions are met:
 - Aircraft is on the ground
 - Parking brake is set
-- Aircraft is stopped (ground speed < 0.5 kt)
+- Aircraft is stopped
 - Engines are off
 
 
