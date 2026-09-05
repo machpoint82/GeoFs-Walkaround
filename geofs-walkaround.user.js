@@ -8,7 +8,9 @@
 // @updateURL    https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js
 // @match        https://www.geo-fs.com/geofs.php*
 // @match        https://*.geo-fs.com/geofs.php*
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -102,18 +104,46 @@
     { id: "rudder", name: "Rudder", local: [0, -1.12, 0.55] }
   ];
 
+  function gmAvailable() {
+    return typeof GM_getValue === "function" && typeof GM_setValue === "function";
+  }
+
   function loadSettings() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      let raw = null;
+      if (gmAvailable()) {
+        raw = GM_getValue(STORAGE_KEY, null);
+      } else {
+        raw = localStorage.getItem(STORAGE_KEY);
+      }
       if (!raw) return { ...DEFAULTS };
-      return { ...DEFAULTS, ...JSON.parse(raw) };
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      return { ...DEFAULTS, ...parsed };
     } catch (_) {
       return { ...DEFAULTS };
     }
   }
 
   function saveSettings() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    try {
+      const json = JSON.stringify(settings);
+      if (gmAvailable()) {
+        GM_setValue(STORAGE_KEY, json);
+      } else {
+        localStorage.setItem(STORAGE_KEY, json);
+      }
+    } catch (_) {}
+  }
+
+  function clearSettingsStorage() {
+    try {
+      if (gmAvailable() && typeof GM_deleteValue === "function") {
+        GM_deleteValue(STORAGE_KEY);
+      }
+    } catch (_) {}
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (_) {}
   }
 
   let settings = loadSettings();
@@ -565,7 +595,7 @@
     showChecklist(true);
     openPanel(true);
     document.getElementById("wa-toggle-btn").textContent = "Exit walkaround";
-    refreshHotkeyBoxesDisabled();
+    refreshLockedControls();
 
     applyCamera();
     requestPointerLock();
@@ -591,7 +621,7 @@
     document.getElementById("wa-toggle-btn").textContent = "Start walkaround";
     document.getElementById("wa-look-label")?.classList.remove("show");
     stopAmbient();
-    refreshHotkeyBoxesDisabled();
+    refreshLockedControls();
 
     try {
       geofs.camera.set(state.lastCamMode);
@@ -777,11 +807,11 @@
     if (toggleDisplay) toggleDisplay.textContent = formatKeyLabel(settings.hotkeyToggle);
     if (lockDisplay) lockDisplay.textContent = formatKeyLabel(settings.hotkeyPointerLock);
 
-    refreshHotkeyBoxesDisabled();
+    refreshLockedControls();
   }
 
-  function refreshHotkeyBoxesDisabled() {
-    ["wa-hk-panel-box", "wa-hk-toggle-box", "wa-hk-lock-box", "wa-hk-checklist-box"].forEach(id => {
+  function refreshLockedControls() {
+    ["wa-hk-panel-box", "wa-hk-toggle-box", "wa-hk-lock-box", "wa-hk-checklist-box", "wa-reset-settings"].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.disabled = state.active;
@@ -829,6 +859,41 @@
       renderHotkeyBoxes();
     };
     window.addEventListener("keydown", handler, true);
+  }
+
+  function resetSettingsToDefaults() {
+    if (state.active) return;
+    const confirmed = window.confirm("Reset all Walkaround settings and hotkeys to defaults?");
+    if (!confirmed) return;
+
+    clearSettingsStorage();
+    settings = { ...DEFAULTS };
+    saveSettings();
+
+    const root = document.getElementById("geofs-walkaround-ui");
+    if (root) {
+      root.style.left = "14px";
+      root.style.top = settings.uiTopPct + "%";
+      root.style.transform = "translateY(-50%)";
+    }
+
+    const walkSpeedEl = document.getElementById("wa-walk-speed");
+    if (walkSpeedEl) walkSpeedEl.value = settings.walkSpeedMps;
+    const runMultEl = document.getElementById("wa-run-mult");
+    if (runMultEl) runMultEl.value = settings.runMultiplier;
+    const vertSpeedEl = document.getElementById("wa-vert-speed");
+    if (vertSpeedEl) vertSpeedEl.value = settings.verticalSpeedMps;
+    const maxHEl = document.getElementById("wa-max-h");
+    if (maxHEl) maxHEl.value = settings.maxExtraHeightM;
+    const soundEnabledEl = document.getElementById("wa-sound-enabled");
+    if (soundEnabledEl) soundEnabledEl.checked = !!settings.soundEnabled;
+    const soundVolEl = document.getElementById("wa-sound-vol");
+    if (soundVolEl) soundVolEl.value = Math.round(settings.soundVolume * 100);
+
+    renderHotkeyBoxes();
+    resetChecklist();
+    setHotkeyStatus("");
+    setStatus("Settings reset to defaults", "ok");
   }
 
   function checkForUpdate() {
@@ -939,7 +1004,7 @@
         background:#34383c; color:#e8e9ea; cursor:pointer; font:600 10px Arial;
       }
       #wa-actions button:hover, .wa-btn:hover { background:#42474c; }
-      #wa-actions button:disabled { opacity:.4; cursor:not-allowed; }
+      #wa-actions button:disabled, .wa-btn:disabled { opacity:.4; cursor:not-allowed; }
       #wa-status { margin-top:8px; color:#9aa1a6; font:400 10px/1.35 Arial; }
       #wa-status[data-mode=error] { color:#d8a6a6; }
       #wa-status[data-mode=ok] { color:#b7d7c4; }
@@ -978,6 +1043,8 @@
       .wa-hk-box.disabled { opacity:.4; cursor:not-allowed; }
       #wa-hk-status { font:400 10px/1.3 Arial; color:#9aa1a6; min-height:12px; margin-top:4px; }
       #wa-settings-body { margin-top:4px; }
+      #wa-reset-settings { border-color: rgba(226,128,128,.5); color:#e8a6a6; }
+      #wa-reset-settings:hover { background:#3a2c2c; }
     `;
     document.head.appendChild(style);
 
@@ -1046,6 +1113,7 @@
           </div>
 
           <button class="wa-btn" id="wa-save-settings" style="width:100%;margin-top:8px">Save settings</button>
+          <button class="wa-btn" id="wa-reset-settings" style="width:100%;margin-top:8px" type="button">Reset to defaults</button>
         </div>
       </div>
     `;
@@ -1125,6 +1193,10 @@
       settings.soundVolume = clamp(+root.querySelector("#wa-sound-vol").value / 100, 0, 1);
       saveSettings();
       setStatus("Settings saved", "ok");
+    };
+    root.querySelector("#wa-reset-settings").onclick = e => {
+      e.stopPropagation();
+      resetSettingsToDefaults();
     };
 
     root.querySelectorAll("input,button").forEach(el => {
