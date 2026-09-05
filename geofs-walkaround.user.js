@@ -17,6 +17,7 @@
 (function () {
   "use strict";
 
+  const page = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
   const STORAGE_KEY = "geofsWalkaround_v11";
   const CURRENT_VERSION = "1.0.0-beta";
   const VERSION_CHECK_URL = "https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js";
@@ -174,13 +175,13 @@
 
   function ready() {
     return !!(
-      window.geofs &&
-      geofs.aircraft &&
-      geofs.aircraft.instance &&
-      Array.isArray(geofs.aircraft.instance.llaLocation) &&
-      geofs.camera &&
-      geofs.api &&
-      window.Cesium
+      page.geofs &&
+      page.geofs.aircraft &&
+      page.geofs.aircraft.instance &&
+      Array.isArray(page.geofs.aircraft.instance.llaLocation) &&
+      page.geofs.camera &&
+      page.geofs.api &&
+      page.Cesium
     );
   }
 
@@ -194,7 +195,7 @@
   }
 
   function aircraft() {
-    return geofs.aircraft.instance;
+    return page.geofs.aircraft.instance;
   }
 
   function aircraftLLA() {
@@ -214,7 +215,7 @@
       return ac.engines.every(e => !e || e.on === false || e.rpm <= 5);
     }
     try {
-      const rpm = geofs.animation?.values?.rpm ?? geofs.animation?.values?.engineRpm;
+      const rpm = page.geofs.animation?.values?.rpm ?? page.geofs.animation?.values?.engineRpm;
       if (Number.isFinite(rpm)) return rpm < 5;
     } catch (_) {}
     return true;
@@ -292,23 +293,23 @@
 
   function sampleGroundAlt(lat, lon, fallback) {
     try {
-      const globe = geofs.api?.viewer?.scene?.globe;
-      if (globe && Cesium?.Cartographic) {
-        const c = Cesium.Cartographic.fromDegrees(lon, lat);
+      const globe = page.geofs.api?.viewer?.scene?.globe;
+      if (globe && page.Cesium?.Cartographic) {
+        const c = page.Cesium.Cartographic.fromDegrees(lon, lat);
         const h = globe.getHeight(c);
         if (Number.isFinite(h)) return h;
       }
     } catch (_) {}
-    if (Number.isFinite(geofs.camera?.groundAltitude)) return geofs.camera.groundAltitude;
+    if (Number.isFinite(page.geofs.camera?.groundAltitude)) return page.geofs.camera.groundAltitude;
     return Number.isFinite(fallback) ? fallback : state.groundAlt || 0;
   }
 
   function applyCamera() {
-    const cam = geofs.camera.cam;
+    const cam = page.geofs.camera.cam;
     if (!cam || !state.pos) return;
     try {
       cam.setView({
-        destination: Cesium.Cartesian3.fromDegrees(state.pos.lon, state.pos.lat, state.pos.alt),
+        destination: page.Cesium.Cartesian3.fromDegrees(state.pos.lon, state.pos.lat, state.pos.alt),
         orientation: {
           heading: state.headingRad,
           pitch: state.pitchRad,
@@ -317,7 +318,7 @@
       });
     } catch (_) {
       try {
-        geofs.api.setCameraPositionAndOrientation(
+        page.geofs.api.setCameraPositionAndOrientation(
           cam,
           [state.pos.lat, state.pos.lon, state.pos.alt],
           [(((state.headingRad * 180) / Math.PI) + 360) % 360, (state.pitchRad * 180) / Math.PI, 0]
@@ -538,9 +539,9 @@
 
   function zeroFlightControlsOnce() {
     try {
-      if (window.controls) {
+      if (page.controls) {
         ["pitch", "roll", "yaw", "throttle", "rudder"].forEach(k => {
-          if (k in controls) controls[k] = 0;
+          if (k in page.controls) page.controls[k] = 0;
         });
       }
     } catch (_) {}
@@ -579,8 +580,8 @@
     await fadeToBlack(450);
 
     state.sizeFactor = estimateSizeFactor();
-    state.lastCamMode = geofs.camera.currentMode;
-    geofs.camera.set(4);
+    state.lastCamMode = page.geofs.camera.currentMode;
+    page.geofs.camera.set(4);
 
     const spawn = spawnPosition();
     state.pos = spawn.pos;
@@ -624,9 +625,9 @@
     refreshLockedControls();
 
     try {
-      geofs.camera.set(state.lastCamMode);
+      page.geofs.camera.set(state.lastCamMode);
     } catch (_) {
-      geofs.camera.set(1);
+      page.geofs.camera.set(1);
     }
     setStatus("Walkaround off", "idle");
 
