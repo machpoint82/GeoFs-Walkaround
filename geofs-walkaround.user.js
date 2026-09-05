@@ -37,7 +37,7 @@
     hotkeyToggle: "x",
     hotkeyPointerLock: "!",
     hotkeyChecklist: "",
-    soundUrl: "https://od.lk/s/MzlfMTAzMzYzNzAxX0c0THM5/GroundwalkaroundDallasone.mp3",
+    soundUrl: "https://od.lk/s/MzlfMTAzMzc1NDU4X0tYRkg3/Walkaround.mp3",
     soundEnabled: true,
     soundVolume: 0.5
   };
@@ -119,7 +119,7 @@
       }
       if (!raw) return { ...DEFAULTS };
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-      return { ...DEFAULTS, ...parsed };
+          return { ...DEFAULTS, ...parsed, soundUrl: DEFAULTS.soundUrl };
     } catch (_) {
       return { ...DEFAULTS };
     }
@@ -165,7 +165,6 @@
     groundAlt: 0,
     extraHeight: 0,
     lastProbeAt: 0,
-    lastFlightId: null,
     checked: new Set(),
     lastLabel: null,
     raf: 0,
@@ -361,24 +360,6 @@
     }
   }
 
-  function flightSignature() {
-    const ac = aircraftLLA();
-    return `${ac.lat.toFixed(3)}_${ac.lon.toFixed(3)}_${aircraft().id || 0}`;
-  }
-
-  function maybeResetChecklistOnNewFlight() {
-    const sig = flightSignature();
-    if (state.lastFlightId == null) {
-      state.lastFlightId = sig;
-      return;
-    }
-    if (sig !== state.lastFlightId) {
-      state.lastFlightId = sig;
-      state.savedPos = null;
-      resetChecklist();
-      openPanel(true);
-    }
-  }
 
   let ambientAudio = null;
   let ambientFadeInterval = null;
@@ -1228,7 +1209,6 @@
   function loop(tPrev) {
     const now = performance.now();
     const dt = Math.min(0.05, (now - tPrev) / 1000);
-    maybeResetChecklistOnNewFlight();
     if (state.active) updateMovement(dt);
     state.raf = requestAnimationFrame(() => loop(now));
   }
@@ -1237,7 +1217,6 @@
     await waitReady();
     addUI();
     bindInput();
-    state.lastFlightId = flightSignature();
     openPanel(true);
     state.raf = requestAnimationFrame(() => loop(performance.now()));
     setInterval(updateSafetyUI, 500);
