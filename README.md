@@ -6,6 +6,13 @@ Walk around your aircraft on the ground, inspect parts, run a realistic checklis
 
 **Status:** 1.0-beta (in development)
 
+<p align="center">
+  <img src="preview/preview.png" alt="Walkaround preview" width="720">
+</p>
+
+<p align="center">
+  <img src="preview/preview2.png" alt="Walkaround preview" width="720">
+</p>
 ---
 
 ## Features
