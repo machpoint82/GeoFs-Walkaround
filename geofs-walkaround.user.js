@@ -3,7 +3,7 @@
 // @namespace    https://www.github.com/machpoint82
 // @version      1.0.0-beta
 // @description  Ground walkaround for geofs.
-// @icon         https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/icon.png
+// @icon         https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/preview/icon.png
 // @downloadURL  https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js
 // @updateURL    https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js
 // @match        https://www.geo-fs.com/geofs.php*
