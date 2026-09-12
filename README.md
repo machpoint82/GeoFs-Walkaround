@@ -2,6 +2,8 @@
 
 Ground walkaround / pre-flight inspection camera for [GeoFS](https://www.geo-fs.com).
 
+## Due to Academic reasons, do not expect any update till december.
+
 Walk around your aircraft on the ground, inspect parts, run a realistic checklist, and experience a proper pre-flight flow before takeoff.
 
 **Status:** 1.0
