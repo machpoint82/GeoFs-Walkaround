@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GeoFS Walkaround
 // @namespace    https://www.github.com/machpoint82
-// @version      1.0.0-beta
+// @version      1.0
 // @description  Ground walkaround for geofs.
 // @icon         https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/preview/icon.png
 // @downloadURL  https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js
@@ -19,7 +19,7 @@
 
   const page = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
   const STORAGE_KEY = "geofsWalkaround_v11";
-  const CURRENT_VERSION = "1.0.0-beta";
+  const CURRENT_VERSION = "1.0";
   const VERSION_CHECK_URL = "https://raw.githubusercontent.com/machpoint82/GeoFs-Walkaround/main/geofs-walkaround.user.js";
   const RELEASES_URL = "https://github.com/machpoint82/GeoFs-Walkaround/releases/latest";
 
@@ -1035,8 +1035,8 @@
     const root = document.createElement("div");
     root.id = "geofs-walkaround-ui";
     root.innerHTML = `
-      <div class="wa-title" id="wa-drag-handle">Walkaround 1.0 beta</div>
-      <div class="wa-help">Ground inspection camera near your aircraft. In development.</div>
+      <div class="wa-title" id="wa-drag-handle">Walkaround 1.0</div>
+      <div class="wa-help">Ground inspection camera near your aircraft.</div>
 
       <div id="wa-update-banner" class="wa-update-banner"></div>
 
@@ -1221,7 +1221,7 @@
     state.raf = requestAnimationFrame(() => loop(performance.now()));
     setInterval(updateSafetyUI, 500);
     checkForUpdate();
-    console.log("[Walkaround 1.0 beta] ready");
+    console.log("[Walkaround 1.0] ready");
   }
 
   main();
